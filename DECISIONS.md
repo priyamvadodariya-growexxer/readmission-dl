@@ -7,54 +7,94 @@ The question to answer is not "what does this technique do" — it is "why did Y
 ---
 
 ## Decision 1: Data cleaning strategy
-*Complete after Phase 1 (by approximately 1:30)*
 
-**What I did:**
+### What I did:
+- Fixed invalid values:
+  - Replaced `age = 999` with NaN and imputed with median  
+  - Removed physiologically impossible blood pressure values (<50) and imputed  
+- Parsed `admission_date` safely and extracted `admission_month`  
+- Created a missing indicator for `glucose_level_mgdl` and used median imputation  
+- Applied log transforms to skewed features:
+  - `length_of_stay_days`, `prior_admissions_1yr`, `n_medications_discharge`  
+- Added feature interactions / risk flags:
+  - High comorbidity indicator  
+  - Interaction between comorbidity and prior admissions  
+- Applied one-hot encoding for categorical variables  
+- Added a final global NaN safety check  
 
+### Why I did it:
+- `age = 999` distorted distribution heavily  
+- Blood pressure contained impossible values → data corruption  
+- Glucose missingness was informative (not random)  
+- Several features were right-skewed  
+- Features had low linear correlation → interactions important  
+- Encoded categorical values had no ordinal meaning  
 
-**Why I did it (not why the technique works — why THIS choice given what you observed in the data):**
+### What I considered and rejected:
+- Dropping rows → dataset too small  
+- Dropping glucose → lost signal  
+- Treating encoded categories as ordinal → incorrect assumption  
+- Using embeddings → overkill for dataset size  
 
+### What would happen if I was wrong:
+- Model learns corrupted patterns  
+- Important signals lost  
+- Poor generalization and unstable predictions  
 
-**What I considered and rejected:**
-
-
-**What would happen if I was wrong here:**
-
-
----
 
 ## Decision 2: Model architecture and handling class imbalance
-*Complete after Phase 2 (by approximately 3:00)*
 
-**What I did:**
+### What I did:
+- Used shallow MLP (64 → 32 → 1)
+- Added ReLU, BatchNorm, Dropout  
+- Used BCEWithLogitsLoss with pos_weight  
+- Tuned pos_weight  
+- Used Adam optimizer with weight decay  
+- Applied early stopping and 5-fold stratified CV  
 
+### Why I did it:
+- Small dataset → avoid deep networks  
+- Tabular data → MLP sufficient  
+- Severe imbalance (~9%) → required weighting  
+- CV showed variability → needed robustness  
 
-**Why I did it (not why the technique works — why THIS choice given what you observed in the data):**
+### What I considered and rejected:
+- Deep networks → overfitting risk  
+- Tree-based models → assignment constraint  
+- SMOTE → unstable for DL  
+- Ignoring imbalance → trivial model  
 
+### What would happen if I was wrong:
+- Overfitting or underfitting  
+- Poor minority detection  
+- Unstable performance  
 
-**What I considered and rejected:**
-
-
-**What would happen if I was wrong here:**
-
-
----
 
 ## Decision 3: Evaluation metric and threshold selection
-*Complete after Phase 3 (by approximately 4:00)*
 
-**What I did:**
+### What I did:
+- Used AUROC for ranking  
+- Used F1-score as main metric  
+- Tuned threshold instead of 0.5  
+- Used OOF predictions for stable threshold  
+- Explored calibration  
 
+### Why I did it:
+- Accuracy misleading due to imbalance  
+- AUC high but F1 moderate → threshold issue  
+- Default threshold suboptimal  
+- Needed stable threshold across folds  
+- Real-world focus on recall  
 
-**Why I did it (not why the technique works — why THIS choice given what you observed in the data):**
+### What I considered and rejected:
+- Accuracy → misleading  
+- Fixed threshold → suboptimal  
+- Per-fold thresholds → inconsistent  
+- Evaluating on test → data leakage  
 
-
-**What I considered and rejected:**
-
-
-**What would happen if I was wrong here:**
-
-
+### What would happen if I was wrong:
+- High AUC but poor real-world performance  
+- Missed high-risk patients  
 ---
 
 *Word count guidance: aim for 80–150 words per decision. More is not better — precision is.*

@@ -1,8 +1,11 @@
 # Readmission-DL — City General Hospital 30-day Readmission Prediction
 
-**Student name:**
+**Student name:** 
+Priyam Vadodaria </br>
 **Student ID:**
+1128 </br>
 **Submission date:**
+27 March, 2026 
 
 ---
 
@@ -29,11 +32,11 @@ Predict whether a patient will be readmitted within 30 days of discharge using s
 
 | Metric | Value |
 |--------|-------|
-| AUROC | |
-| F1 (minority class) | |
-| Precision (minority) | |
-| Recall (minority) | |
-| Decision threshold used | |
+| AUROC | 0.937075|
+| F1 (minority class) |0.581395 |
+| Precision (minority) | 0.480769|
+| Recall (minority) | 0.735294|
+| Decision threshold used | 0.210000|
 
 ---
 
@@ -54,7 +57,7 @@ python notebooks/solution.ipynb  # or run cells in order
 ### 3. Run inference on the test set
 
 ```bash
-python src/predict.py --input data/test.csv --output predictions.csv
+python predict.py --input ../data/test.csv --output ../data/predictions.csv
 ```
 
 The output CSV will contain two columns: `patient_id` and `readmission_probability`.
@@ -72,6 +75,8 @@ readmission-dl/
 │   └── solution.ipynb
 ├── src/
 │   └── predict.py
+├── models/
+|   └── .wt files
 ├── DECISIONS.md
 ├── requirements.txt
 └── README.md
